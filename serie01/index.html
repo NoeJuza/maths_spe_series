@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Série 1</title>
+    <script src="./math.js" type="text/javascript"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          }
+        };
+    </script>
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <a href="../index.html">Retour à l'index</a>
+    <h1>Série 1</h1>
+    <div>
+        <h2>Exercice 1</h2>
+        <p>Bissection pour $e^x - 4x$, <input type="number" name="ittrs" id="ex1_itrs" min="1" max="100" step="1"> (défaut=6) ittérations dans la range [0,1]</p>
+        <button id="ex1">Lancer</button><button id="ex1Reset">Reset</button>
+        <table>
+            <tbody id="tableEx1">
+                <tr>
+                    <th>Iteration</th>
+                    <th>a</th>
+                    <th>b</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h2>Exercice 2</h2>
+        <p>Déterminer les 0 de: </p>
+        <p>(a) $f(x) = e^x -4x$: (a=0,b=1), (a=1.5,b=2.5) <span id="ex2ResultA"></span> </p>
+        <p>(b) $f(x) = -2x^4 + 3x^2 + \frac{11}{8}$: (a=-2,b=-1), (a=1,b=2) <span id="ex2ResultB"></span> </p>
+        <p>(c) $f(x) = \frac{1}{2}xe^x -2x^2$: (a=-0.1,b=0.001), (a=0.2,b=0.6), (a=2,b=2.4) <span id="ex2ResultC"></span> </p>
+        <p>avec la méthode de la bissection (tolérance = $10^{-6}$)</p>
+        <button id="ex2">Lancer</button>
+    </div>
+    <div>
+        <h2>Exercice 3</h2>
+        <p>3 ittérations Newton ($x_0=0$) sur $f(x) = e^x - 4x$</p>
+        <button id="ex3">Lancer</button> <button id="ex3Reset">Reset</button>
+        <table>
+            <tbody id="tableEx3">
+                <tr>
+                    <th>ittération</th>
+                    <th>$x_i$</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h2>Exercice 4</h2>
+        <p>Trouver les 0(s) des fonctions</p>
+        <p>(a) $f(x) = e^x -4x$: ($x_0 =0$), ($x_0=1.5$)<span id="ex4ResultA"></span> </p>
+        <p>(b) $f(x) = -2x^4 + 3x^2 + \frac{11}{8}$: ($x_0=-2$), ($x_0 = 1$) <span id="ex4ResultB"></span> </p>
+        <p>(c) $f(x) = \frac{1}{2}xe^x -2x^2$: ($x_0 = -0.1$), ($x_0 = 0.2$), ($x_0=2$) <span id="ex4ResultC"></span> </p>
+        <p>Avec la méthode de Newton</p>
+        <button id="ex4">Lancer</button>
+    </div>
+    <div>
+        <h2>Exercice 5</h2>
+        <p>Newton converge vers le résultat plus rapidement que la bissection</p>
+    </div>
+    <div>
+        <h2>Exercice 6</h2>
+        <p>soit $f(x) = -2x^4 + 3x^2 + \frac{11}{8}$, calculer les 0 avec newton pour:</p>
+        <p>(a) $x_0 = 2$: <span id="ex6ResultA"></span></p>
+        <p>(b) $x_0 = 2$: <span id="ex6ResultB"></span> Que se passe-t-il ? Ici, Newton ne converge pas vers une solution</p>
+        <button id="ex6">Lancer</button>
+    </div>
+    <div>
+        <h2>Exercice 7</h2>
+        <p>c.f. code source "betterNewton"</p>
+        <p>petit test avec $f(x) = e^x -4x$: ($x_0 =0$), ($x_0=1.5$) <span id="ex7Result"></span></p>
+        <button id="ex7">Lancer</button>
+    </div>
+    <script>
+    // GLOBAL
+    const tol = 1e-6; // 1*10^(-6)
+    const resetTable = (id)=>{
+        list = Array.from(document.getElementById(id).children)
+        list.splice(2,list.length)
+        document.getElementById(id).replaceChildren(...list)
+    }
+    //ex1
+    document.getElementById("ex1").addEventListener("click", ()=>{
+        //fucntion
+        const f = (x) => math.exp(x) - (4*x);
+
+        const table = document.getElementById("tableEx1")
+        const nbIttrs = parseInt(document.getElementById("ex1_itrs").value) || 6;
+        let a = 0.0
+        let b = 1.0
+        for (let index = 0; index < nbIttrs; index++) {
+            const c  = (a+b)/2
+            //console.log(a,b,c)
+            if( f(a) * f(c) < 0){
+                b = c
+            }else{
+                a = c
+            }
+            const tr = document.createElement("tr")
+            const tdIttr = document.createElement("td")
+            tdIttr.innerText = (index+1).toString();
+            const tdA = document.createElement("td")
+            tdA.innerText = a.toString();
+            const tdB = document.createElement("td")
+            tdB.innerText = b.toString();
+            tr.appendChild(tdIttr)
+            tr.appendChild(tdA)
+            tr.appendChild(tdB)
+            table.appendChild(tr)
+        }
+    })
+    document.getElementById("ex1Reset").addEventListener("click", () =>{resetTable("tableEx1")})
+    //ex2
+    /**
+     * Bissection comme vu en classe
+     * @param {float} a lower bound
+     * @param {float} b upper bound
+     * @param {function} f function that you want to do the bissection of
+     * @param {number} t tolérance
+     * @returns {bigNumber} retourne le "0"
+     */
+    const bissection = (a,b,f,t) => {
+        let c
+        while ( (math.abs(b-a)) > (t*math.abs(b)) ){
+            c = (a+b)/2
+            if ( f(c)*f(a) < 0){
+                b=c;
+            }else{
+                a=c;
+            }
+        }
+        return (a+b)/2;
+    }
+    document.getElementById("ex2").addEventListener("click", ()=>{
+        const a = (x) => math.exp(x) - (4*x);
+        //-2x^4 + 3x^2 + \frac{11}{8}
+        const b = (x) => -2*math.pow(x,4) + 3*math.pow(x,2) + (11/8);
+        //\frac{1}{2}xe^x -2x^2
+        const c = (x) =>  (((1/2)* x * Math.exp(x)) - (2 * Math.pow(x,2)));
+        const resA1 = bissection(0,1,a,tol)
+        const resA2 = bissection(1.5,2.5,a,tol)
+        const resB1 = bissection(-2,-1,b,tol)
+        const resB2 = bissection(1,2,b,tol)
+        const resC1 = bissection(-0.1,0.001,c,tol) // (weird behavior otherwise)
+        const resC2 = bissection(0.2,0.6,c,tol)
+        const resC3 = bissection(2,2.4,c,tol)
+        document.getElementById("ex2ResultA").innerText = `${math.round(resA1,3)}, ${math.round(resA2,3)}`
+        document.getElementById("ex2ResultB").innerText = `${math.round(resB1,3)}, ${math.round(resB2,3)}`
+        document.getElementById("ex2ResultC").innerText = `${math.round(resC1,3)}, ${math.round(resC2,3)}, ${math.round(resC3,3)}`
+    })
+    //ex3
+    document.getElementById("ex3").addEventListener("click", () =>{
+        //fucntion
+        const f = (x) => math.exp(x) - (4*x);
+        const fp = (x) => math.exp(x) - 4;
+
+        const table = document.getElementById("tableEx3")
+        const nbIttrs = 3;
+        let xi = 0.0
+        for (let index = 0; index < nbIttrs; index++) {
+            xi = xi - (f(xi)/fp(xi))
+            const tr = document.createElement("tr")
+            const tdIttr = document.createElement("td")
+            tdIttr.innerText = (index+1).toString();
+            const tdxi = document.createElement("td")
+            tdxi.innerText = xi.toString();
+            tr.appendChild(tdIttr)
+            tr.appendChild(tdxi)
+            table.appendChild(tr)
+        }
+    })
+    document.getElementById("ex3Reset").addEventListener("click", () =>{resetTable("tableEx3")})
+    //ex4
+
+    /**
+     * Newton comme vu en classe
+     * @param {number} x0 première approx du 0
+     * @param {Function} f fonction dont on cherche le 0
+     * @param {Function} fp dérivée de f
+     * @param {number} t tolérance
+     * @returns {number} le "0"
+     */
+    const newton = (x0,f,fp,t) =>{
+        let nbItts=0
+        while(math.abs(f(x0)) > t){
+            nbItts++
+            x0 = x0 - (f(x0)/fp(x0))
+            if(nbItts > 10000000) throw new Error("newton did not converge :'(")
+        }
+        return x0
+    }
+    document.getElementById("ex4").addEventListener("click", ()=>{
+        const a = (x) => math.exp(x) - (4*x);
+        const ap = (x) => math.exp(x) - 4;
+        //-2x^4 + 3x^2 + \frac{11}{8}
+        const b = (x) => -2*math.pow(x,4) + 3*math.pow(x,2) + (11/8);
+        const bp = (x) => -8*math.pow(x,3) + 6*x;
+        //\frac{1}{2}xe^x -2x^2
+        const c = (x) =>  (((1/2)* x * Math.exp(x)) - (2 * Math.pow(x,2)));
+        const cp = (x) => ((1/2) * ( (math.exp(x)*x) + math.exp(x)) ) - (4*x);
+        const resA1 = newton(0,a,ap,tol)
+        const resA2 = newton(1.5,a,ap,tol)
+        const resB1 = newton(-2,b,bp,tol)
+        const resB2 = newton(1,b,bp,tol)
+        const resC1 = newton(-0.1,c,cp,tol)
+        const resC2 = newton(0.2,c,cp,tol)
+        const resC3 = newton(1.6,c,cp,tol)
+        document.getElementById("ex4ResultA").innerText = `${math.round(resA1,3)}, ${math.round(resA2,3)}`
+        document.getElementById("ex4ResultB").innerText = `${math.round(resB1,3)}, ${math.round(resB2,3)}`
+        document.getElementById("ex4ResultC").innerText = `${math.round(resC1,3)}, ${math.round(resC2,3)}, ${math.round(resC3,3)}`
+    })
+    //ex6
+    document.getElementById("ex6").addEventListener("click", ()=>{
+        const b = (x) => -2*math.pow(x,4) + 3*math.pow(x,2) + (11/8);
+        const bp = (x) => -8*math.pow(x,3) + 6*x;
+        const resA = newton(2,b,bp,tol)
+        let resB
+        try{
+            resB = math.round(newton(0.5,b,bp,tol),3) 
+        }catch (e){
+            resB = e
+        }
+        document.getElementById("ex6ResultA").innerText = `${math.round(resA,3)}`
+        document.getElementById("ex6ResultB").innerText = `${resB}`
+    })
+    
+    //ex7
+    /**
+     * A newton that computes an approximation of the derivative on its own
+     * @param {number} x0 initial 0 approximation
+     * @param {Function} f function that we are looking to get the 0 of
+     * @param {number} t tolerance
+     * @returns {number} the 0
+     */
+    const betterNewton = (x0, f, t) =>{
+        const verySmallH = 1e-8
+        const fp = (x) => (f(x+verySmallH) - f(x))/verySmallH
+        return newton(x0,f,fp,t)
+    }
+    document.getElementById("ex7").addEventListener("click", ()=>{
+        const a = (x) => math.exp(x) - (4*x);
+        const resA1 = betterNewton(0,a,tol)
+        const resA2 = betterNewton(1.5,a,tol)
+        document.getElementById("ex7Result").innerText = `${math.round(resA1,3)}, ${math.round(resA2,3)}`
+    })
+    </script>
+
+</body>
+</html>
